@@ -280,19 +280,41 @@ public class NfcPlugin
         }
     }
 
-    private byte[] hex2Byte(final String hex)
+    public byte[] hex2Byte(final String s)
     {
-        return new BigInteger(hex, 16).toByteArray();
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2)
+        {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+        }
+
+        return data;
     }
 
-    private String byte2Hex(final byte[] b)
+    private String byte2Hex(final byte[] bytes)
     {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < b.length; i++)
+        if (bytes.length == 0)
         {
-            sb.append(Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1));
+            return new String("");
         }
-        return sb.toString();
+
+        final char[] hexArray = { '0', '1', '2', '3', '4', '5', '6', '7',
+                '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+        int v;
+
+        char[] hexChars = new char[bytes.length * 2];
+
+        for ( int j = 0; j < bytes.length; j++ )
+        {
+            v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+
+        return new String(hexChars);
     }
 
     private String getNfcStatus()
